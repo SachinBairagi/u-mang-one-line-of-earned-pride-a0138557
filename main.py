@@ -51,6 +51,18 @@ def main() -> int:
     out_path = os.path.join(out_dir, "entry.txt")
     with open(out_path, "w", encoding="utf-8", newline="\n") as handle:
         handle.write(line + "\n")
+
+    # Read the file back and confirm what landed on disk is exactly
+    # the validated line, one line, nothing more. A silent short
+    # write or a stray extra line would otherwise ship unnoticed.
+    with open(out_path, "r", encoding="utf-8", newline="\n") as handle:
+        written = handle.read()
+    if written != line + "\n":
+        print("error: entry.txt on disk does not match the line", file=sys.stderr)
+        return 1
+    if written.count("\n") != 1:
+        print("error: entry.txt is not exactly one line", file=sys.stderr)
+        return 1
     return 0
 
 
